@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
 	# Create a 'cache' directory if it does not already exist
 	if not os.path.exists('cache'):
-		os.makedirs(cmd.expDir)
+		os.makedirs('cache')
 		print('Created dir: ', 'cache')
 
 	"""
