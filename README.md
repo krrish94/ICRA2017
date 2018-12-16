@@ -2,6 +2,8 @@
 
 J. Krishna Murthy, G.V. Sai Krishna, Falak Chhaya, and K. Madhava Krishna
 
+> [**Paper**](https://arxiv.org/abs/1609.09468)
+
 > **Note:** This is an abridged and simplified re-implementation of the ICRA 2017 paper _Reconstructing vehicles from a single image: shape priors for road scene understanding_. Several factors, including an agreement, delayed and prevented this release for over a year-and-a-half. Apologies for the inconvenience.
 
 > **Contributors:** Original implementation by [*Krishna Murthy*](https://krrish94.github.io) 
