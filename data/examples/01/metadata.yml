@@ -1,0 +1,16 @@
+id: example-01
+dataset: KITTI Tracking
+split: Train
+
+# Metadata about the example.
+metadata:
+  # Sequence number
+	sequence: 03
+  # Frame number
+  frame: 000013
+  # Car ID (ground-truth ID, as per KITTI tracking data)
+  carid: 00
+  # Car bounding box in (x, y, w, h) format
+  bbox: [774.175909, 182.388094, 283.692744, 154.949255]
+  # Ground-truth azimuth (yaw) angle (KITTI convention, radians)
+  yaw: -1.609695

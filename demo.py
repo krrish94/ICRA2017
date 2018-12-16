@@ -32,6 +32,11 @@ import utils
 
 if __name__ == '__main__':
 
+	# Create a 'cache' directory if it does not already exist
+	if not os.path.exists('cache'):
+		os.makedirs(cmd.expDir)
+		print('Created dir: ', 'cache')
+
 	"""
 	Filepaths
 	"""
@@ -310,9 +315,11 @@ if __name__ == '__main__':
 	viewpointWeights = 0.75 * viewpointWeights + 0.1 * np.full(viewpointWeights.shape, 1.)
 	for i in range(viewpointWeights.shape[0]):
 		inFile.write(str(viewpointWeights[i]) + '\n')
-	# Mean shape
-	for i in range(wireframe3D_afterPoseAdjustment.shape[0]):
-		cur = wireframe3D_afterPoseAdjustment[i,:]
+	# Mean shape (Note that we are writing in the initialized 3D wireframe and NOT the 
+	# pose adjusted wireframe. The Ceres code takes care of the conversion. Writing the 
+	# pose adjusted wireframe will likely mess up the results)
+	for i in range(meanShape_scaled_rotated_translated.shape[0]):
+		cur = meanShape_scaled_rotated_translated[i,:]
 		inFile.write(str(cur[0]) + ' ' + str(cur[1]) +' ' + str(cur[2]) + '\n')
 	# Basis vectors
 	inFile.write(str(numBasisVectors) + '\n')
@@ -351,7 +358,38 @@ if __name__ == '__main__':
 		wireframe2D_afterShapeAdjustment[:,k] = x2D.reshape((3))
 
 	
-	# Display image
+	"""
+	Visualization
+	"""
+
+	fig, ax = plt.subplots(1)
+	ax.imshow(img)
+	# Plot keypoints
+	ax.scatter(keypoints[:,0], keypoints[:,1], c='r')
+	rect = patches.Rectangle((bbox[0], bbox[1]), bbox[2], bbox[3], linewidth=1, edgecolor='r', \
+		facecolor='none')
+	ax.add_patch(rect)
+	w2D = wireframe2D_init
+	lines2D = [[(w2D[0,i], w2D[1,i]), (w2D[0,j], w2D[1,j])] for (i,j) in edges]
+	lc2D = LineCollection(lines2D)
+	ax.add_collection(lc2D)
+	plt.savefig('cache/01.png')
+	plt.close()
+
+	fig, ax = plt.subplots(1)
+	ax.imshow(img)
+	# Plot keypoints
+	ax.scatter(keypoints[:,0], keypoints[:,1], c='r')
+	rect = patches.Rectangle((bbox[0], bbox[1]), bbox[2], bbox[3], linewidth=1, edgecolor='r', \
+		facecolor='none')
+	ax.add_patch(rect)
+	w2D = wireframe2D_afterPoseAdjustment
+	lines2D = [[(w2D[0,i], w2D[1,i]), (w2D[0,j], w2D[1,j])] for (i,j) in edges]
+	lc2D = LineCollection(lines2D)
+	ax.add_collection(lc2D)
+	plt.savefig('cache/02.png')
+	plt.close()
+
 	fig, ax = plt.subplots(1)
 	ax.imshow(img)
 	# Plot keypoints
@@ -363,4 +401,5 @@ if __name__ == '__main__':
 	lines2D = [[(w2D[0,i], w2D[1,i]), (w2D[0,j], w2D[1,j])] for (i,j) in edges]
 	lc2D = LineCollection(lines2D)
 	ax.add_collection(lc2D)
-	plt.savefig('cache/tmp.png')
+	plt.savefig('cache/03.png')
+	plt.close()

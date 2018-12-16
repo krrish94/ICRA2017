@@ -100,9 +100,7 @@ struct LambdaReprojectionError{
 		for(int i=0;i<numVec_;i++){
 			P_[0] = P_[0] + T(l[i])*T(v_[3*i+0]);
 			P_[1] = P_[1] + T(l[i])*T(v_[3*i+1]);
-			P_[2] = P_[2] + T(l[i])*T(v_[3*i+2]);
-
-			
+			P_[2] = P_[2] + T(l[i])*T(v_[3*i+2]);			
 		}
 
 		// Apply the rotation and translation
@@ -158,9 +156,9 @@ struct TranslationRegularizer{
 	template <typename T>
 	bool operator() (const T* trans, T* residuals) const{
 
-		residuals[0] = T(100)*(trans[0]-trans_init_[0]);
-		residuals[1] = T(100)*(trans[1]-trans_init_[1]);
-		residuals[2] = T(100)*(trans[2]-trans_init_[2]);
+		residuals[0] = T(20)*(trans[0]);
+		residuals[1] = T(20)*(trans[1]);
+		residuals[2] = T(100)*(trans[2]);
 
 		return true;
 	}
@@ -181,8 +179,8 @@ struct RotationRegularizer{
 	template <typename T>
 	bool operator() (const T* rot, T* residuals) const{
 
-		residuals[0] = T(1.0)*rot[0];
-		residuals[1] = T(0.0)*rot[1];
+		residuals[0] = T(1000.0)*rot[0];
+		residuals[1] = T(0.0);
 		residuals[2] = T(1000.0)*rot[2];
 
 		return true;

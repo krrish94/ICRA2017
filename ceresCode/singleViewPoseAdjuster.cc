@@ -67,7 +67,8 @@ int main(int argc, char** argv){
 	
 	// ITERATIVE_SCHUR + explicit schur complement = disaster
 	// options.use_explicit_schur_complement = true;
-	options.use_inner_iterations             = true;
+	// options.use_inner_iterations             = true;
+	options.max_num_iterations = 100;
 	options.minimizer_progress_to_stdout     = false;	
 	
 	
@@ -107,6 +108,16 @@ int main(int argc, char** argv){
 		problem.AddResidualBlock(pnpError, new ceres::HuberLoss(30.8), rotAngleAxis,trans);// ceres::HuberLoss(0.8) worked for most cases
 		
 	}
+
+	// Add a regularizer to the translation term (to prevent a huge drift from the initialization)
+	ceres::CostFunction *translationRegularizer = new ceres::AutoDiffCostFunction<TranslationRegularizer, 3, 3>(
+		new TranslationRegularizer(carCenter));
+	problem.AddResidualBlock(translationRegularizer, new ceres::HuberLoss(0.1), trans);
+
+	// Add a rotation regularizer, to ensure that the rotation is about the Y-axis
+	ceres::CostFunction *rotationRegularizer = new ceres::AutoDiffCostFunction<RotationRegularizer, 3, 3>(
+		new RotationRegularizer());
+	problem.AddResidualBlock(rotationRegularizer, NULL, rotAngleAxis);
 
 	
 	// Solve the Optimization Problem ---------------------------------------------------------------------------------------------------

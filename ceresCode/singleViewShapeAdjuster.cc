@@ -1,10 +1,7 @@
 /*
  * Shape adjustmer using keypoint likelihoods from a single image
- * Authors: Junaid Ahmed Ansari & Sarthak Sharma
- * Email: junaid.ansari@research.iiit.ac.in, sarthak.sharma@research.iiit.ac.in
  *
- * This code is an adaptation of Krishna Murthy's (krrish94@gmail.com)
- * original 14 keypoint point Pose Adjuster
+ * This code is an adaptation of Krishna Murthy's original 14-keypoint shape Adjuster
  */
 
 #include <cmath>
@@ -67,9 +64,9 @@ int main(int argc, char** argv){
 	ceres::Solver::Options options;
 	//options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
 	options.linear_solver_type = ceres::DENSE_SCHUR;
-	options.preconditioner_type = ceres::JACOBI;
-	options.minimizer_progress_to_stdout = false;
-	//options.max_num_iterations = 200;
+	// options.preconditioner_type = ceres::JACOBI;
+	// options.minimizer_progress_to_stdout = false;
+	options.max_num_iterations = 100;
 
 	// Declare a Ceres problem instance to hold cost functions
 	ceres::Problem problem;
@@ -93,7 +90,6 @@ int main(int argc, char** argv){
 		ceres::CostFunction *lambdaError = new ceres::AutoDiffCostFunction<LambdaReprojectionError, 2, 3, 42 >(
 			new LambdaReprojectionError(X_bar+3*i, observations+2*i, numVec, curEigVec, K, observationWeights[i], trans));
 
-		
 		// Add a residual block to the problem
 		problem.AddResidualBlock(lambdaError, new ceres::HuberLoss(0.5), rotAngleAxis, lambdas);
 
@@ -101,7 +97,7 @@ int main(int argc, char** argv){
 		ceres::CostFunction *lambdaRegularizer = new ceres::AutoDiffCostFunction<LambdaRegularizer, 3, 42>(
 			new LambdaRegularizer(numVec,curEigVec));
 		// Add a residual block to the problem
-		problem.AddResidualBlock(lambdaRegularizer, new ceres::HuberLoss(0.001), lambdas);
+		problem.AddResidualBlock(lambdaRegularizer, new ceres::HuberLoss(0.1), lambdas);
 
 		// // Create a cost function to regularize 3D keypoint locations (alignment error)
 		// ceres::CostFunction *alignmentError = new ceres::AutoDiffCostFunction<LambdaAlignmentError, 3, 5>(
