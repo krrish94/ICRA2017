@@ -77,7 +77,7 @@ python demo.py
 If you are looking to run this code on some of your own examples of car images, you will first need the following information:
 * **Height** above the ground at which the camera that captured the image is mounted.
 * A **bounding box** of the car in (`x`, `y`, `w`, `h`) format, where `x` and `y` are the X and Y coordinates in the image of the top left corner of the bounding box, `w` is the bounding box width, and `h` is the bounding box height.
-* **Keypoint locations**. Our approach relies on a predefined set of _semantic keypoints_ (wireframe vertices). These are obtained by extracting the region of the image inside of the bounding box, and passing it through a keypoint detector. We repurpose a [_stacked-hourglass model_](https://github.com/princeton-vl/pose-hg-train) for the same. _Stay tuned for the release of the keypoint network_
+* **Keypoint locations**. Our approach relies on a predefined set of _semantic keypoints_ (wireframe vertices). These are obtained by extracting the region of the image inside of the bounding box, and passing it through a keypoint detector. We repurpose a [_stacked-hourglass model_](https://github.com/princeton-vl/pose-hg-train) for the same. _**Get our keypoint detection inference code [here](https://github.com/krrish94/CarKeypoints)**_
 * **Viewpoint guess**. Our approach also relies on an initial (poor) guess of the azimuth (heading/yaw) of the car being observed. We follow the KITTI convention (KITTI calls this variable `ry` in their Tracking dataset ground-truth).
 
 Look at the directory `data/examples` to get a sense of how to represent this data in a format that the `demo.py` script can process.
