@@ -1,16 +1,16 @@
 """
 ``Reconstructing vehicles from a single image`` demo
 
-This code illustrates a heavily simplified, efficient, and robust pipeline abridged from 
-the approach outlined in the ICRA 2017 paper "Reconstructing vehicles from a single image: 
+This code illustrates a heavily simplified, efficient, and robust pipeline abridged from
+the approach outlined in the ICRA 2017 paper "Reconstructing vehicles from a single image:
 Shape priors for road-scene understanding".
 
-This demo code uses 'cars' as the objects of interest (as this was the motivating example 
-from the paper), nevertheless works across many object categories that shape priors can be 
+This demo code uses 'cars' as the objects of interest (as this was the motivating example
+from the paper), nevertheless works across many object categories that shape priors can be
 defined over.
 
-Before running this script, we assume that an object detector has detected bounding boxes in 
-the image, and that we have semantic keypoints detected by a keypoint detection network (we use 
+Before running this script, we assume that an object detector has detected bounding boxes in
+the image, and that we have semantic keypoints detected by a keypoint detection network (we use
 the stacked-hourglass architecture, in our work).
 """
 
@@ -113,7 +113,7 @@ if __name__ == '__main__':
 	# Car bounding box
 	bbox = np.loadtxt(os.path.join(exampleDir, 'bbox.txt'))
 	# Keypoint predictions from a stacked-hourglass network
-	# (Note: these predictions are made by resizing the car bounding box image to 64 x 64, 
+	# (Note: these predictions are made by resizing the car bounding box image to 64 x 64,
 	# and passing it through the stacked-hourglass network.)
 	keypoints = np.loadtxt(os.path.join(exampleDir, 'keypoints.txt'))
 	keypoints = keypoints.reshape((NUM_KEYPOINTS, 3))
@@ -124,11 +124,11 @@ if __name__ == '__main__':
 	keypoints[:,1] = (keypoints[:,1] * bbox[3]) / 64
 	keypoints[:,0] = keypoints[:,0] + bbox[0] - 1
 	keypoints[:,1] = keypoints[:,1] + bbox[1] - 1
-	# Read in a viewpoint estimate of the azimuth (yaw) of the car. In our work, we use a CNN 
-	# that predicts object viewpoints to initialize this variable. The approach works best if 
-	# the initial azimuth is within +/- 30 degrees of the true azimuth. There are several 
-	# off-the-shelf networks one could use for this task. We tried with the viewpoint network from 
-	# the CVPR 2015 paper "Viewpoints and Keypoints" and with the one from the "RenderForCNN" 
+	# Read in a viewpoint estimate of the azimuth (yaw) of the car. In our work, we use a CNN
+	# that predicts object viewpoints to initialize this variable. The approach works best if
+	# the initial azimuth is within +/- 30 degrees of the true azimuth. There are several
+	# off-the-shelf networks one could use for this task. We tried with the viewpoint network from
+	# the CVPR 2015 paper "Viewpoints and Keypoints" and with the one from the "RenderForCNN"
 	# paper at ICCV 2015.
 	azimuth = np.loadtxt(os.path.join(exampleDir, 'azimuth.txt'))
 
@@ -140,12 +140,12 @@ if __name__ == '__main__':
 
 	# Compute (rough) dimensions (length, width, height) of the car shape prior
 	l = np.abs(np.max(meanShape[:,0]) - np.min(meanShape[:,0]))
-	w = np.abs(np.max(meanShape[:,1]) - np.min(meanShape[:,1]))
-	h = np.abs(np.max(meanShape[:,2]) - np.min(meanShape[:,2]))
+	h = np.abs(np.max(meanShape[:,1]) - np.min(meanShape[:,1]))
+	w = np.abs(np.max(meanShape[:,2]) - np.min(meanShape[:,2]))
 
-	# Compute (anisotropic) scaling factors for each axis so that the dimensions of 
+	# Compute (anisotropic) scaling factors for each axis so that the dimensions of
 	# the car shape prior become roughly equal to those of an average KITTI car.
-	# The canonical wireframe is defined such that the width of the car is aligned with 
+	# The canonical wireframe is defined such that the width of the car is aligned with
 	# the Z-axis, the height with the Y-axis, and the length with the X-axis.
 	sz = AVG_CAR_WIDTH / w
 	sy = AVG_CAR_HEIGHT / h
@@ -162,7 +162,7 @@ if __name__ == '__main__':
 		basisVectors_scaled[b,1::3] = sy * basisVectors_scaled[b,1::3]
 		basisVectors_scaled[b,2::3] = sz * basisVectors_scaled[b,2::3]
 
-	# Rotate the "scaled" meanShape and basisVectors from the shape prior coordinate frame 
+	# Rotate the "scaled" meanShape and basisVectors from the shape prior coordinate frame
 	# to the KITTI coordinate frame.
 	R = utils.rotZ(180, 'degrees').dot(utils.rotY(90, 'degrees'))
 	# After rotating, we also need to apply the azimuth (yaw) guess
@@ -177,9 +177,9 @@ if __name__ == '__main__':
 			basisVectors_scaled_rotated[b,3*n:3*(n+1)] = \
 			R.dot(basisVectors_scaled_rotated[b,3*n:3*(n+1)].reshape((3,1))).T
 
-	# Using the height above the ground at which the camera is mounted on the car, we compute an 
+	# Using the height above the ground at which the camera is mounted on the car, we compute an
 	# approximate location of the wirefreme in 3D (in meters!!).
-	# Assuming that the bottom of the car bbox lies on the road, we can back project the bbox 
+	# Assuming that the bottom of the car bbox lies on the road, we can back project the bbox
 	# bottom (mid-point of the bottom of the bbox), via the ground plane, to 3D.
 	bboxBottomInImage = np.asarray([bbox[0] + bbox[2]/2, bbox[1] + bbox[3]-1, 1]).T
 	n = np.asarray([0, -1., 0])
@@ -189,10 +189,10 @@ if __name__ == '__main__':
 		np.asarray([0, -AVG_CAR_HEIGHT/2, 0]), (3,1))
 
 	# Incorporate a translational offset that factors in the azimuth estimate
-	# Currently, the 3D location of the bbox bottom in 3D does not take into account the 
+	# Currently, the 3D location of the bbox bottom in 3D does not take into account the
 	# orientation of the vehicle. Here's where that gets accounted for.
 	carBottomFaceRect = np.asarray([[-AVG_CAR_LENGTH/2, -AVG_CAR_WIDTH/2], \
-		[AVG_CAR_LENGTH/2, -AVG_CAR_WIDTH/2], [AVG_CAR_LENGTH/2, AVG_CAR_WIDTH/2], 
+		[AVG_CAR_LENGTH/2, -AVG_CAR_WIDTH/2], [AVG_CAR_LENGTH/2, AVG_CAR_WIDTH/2],
 		[-AVG_CAR_LENGTH/2, AVG_CAR_WIDTH/2]])
 	rot2D = np.matrix([[np.cos(azimuth), -np.sin(azimuth)], [np.sin(azimuth), np.cos(azimuth)]])
 	carBottomFaceRect_rotated = np.copy(carBottomFaceRect)
@@ -206,11 +206,11 @@ if __name__ == '__main__':
 	bboxBottomIn3D[2,0] += offset
 
 	# Translate the scaled and rotated mean shape
-	# Note: the basis vectors need not be translated, because they're defined centerd about 
+	# Note: the basis vectors need not be translated, because they're defined centerd about
 	# the mean shape.
 	meanShape_scaled_rotated_translated = np.copy(meanShape_scaled_rotated)
 	meanShape_scaled_rotated_translated += np.tile(bboxBottomIn3D, (1,NUM_KEYPOINTS)).T
-	
+
 
 	"""
 	Compute the initialized wireframe in 2D (for plotting purposes)
@@ -315,8 +315,8 @@ if __name__ == '__main__':
 	viewpointWeights = 0.75 * viewpointWeights + 0.1 * np.full(viewpointWeights.shape, 1.)
 	for i in range(viewpointWeights.shape[0]):
 		inFile.write(str(viewpointWeights[i]) + '\n')
-	# Mean shape (Note that we are writing in the initialized 3D wireframe and NOT the 
-	# pose adjusted wireframe. The Ceres code takes care of the conversion. Writing the 
+	# Mean shape (Note that we are writing in the initialized 3D wireframe and NOT the
+	# pose adjusted wireframe. The Ceres code takes care of the conversion. Writing the
 	# pose adjusted wireframe will likely mess up the results)
 	for i in range(meanShape_scaled_rotated_translated.shape[0]):
 		cur = meanShape_scaled_rotated_translated[i,:]
@@ -357,7 +357,7 @@ if __name__ == '__main__':
 		x2D = x2D / x2D[2,0]
 		wireframe2D_afterShapeAdjustment[:,k] = x2D.reshape((3))
 
-	
+
 	"""
 	Visualization
 	"""
